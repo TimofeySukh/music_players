@@ -1,109 +1,70 @@
-# Music Players Integration
+# Music Link Converter
 
-A Python library that provides a unified interface to search and retrieve song information from multiple music streaming platforms:
-- Spotify
-- YouTube Music
-- Deezer
+Browser extension + local Flask backend to convert music links between platforms.
 
 ## Features
+- Paste a music link and get equivalents on other platforms
+- Supported: Spotify, Deezer, YouTube, YouTube Music, Yandex Music, Apple Music
+- Simple popup UI (extension) + JSON API (`/api/convert`)
 
-- Search songs by name and artist across supported platforms
-- Extract song information from platform-specific URLs
-- Convert music links between different platforms
-- Web interface for easy link conversion
-- REST API endpoint for programmatic access
+## Requirements
+- Python 3.12+
+- pip
+- Chrome/Edge or Firefox
 
 ## Setup
-
-1. Install the required packages:
+1) Clone or unpack the repo.
+2) (Optional) Create venv:
 ```bash
-pip install -e .
+python3 -m venv venv
+source venv/bin/activate   # Windows: venv\Scripts\activate
+```
+3) Install deps:
+```bash
+pip install -r requirements.txt
 ```
 
-2. Set up your API credentials:
-   - Copy `.env.example` to `.env`
-   - Fill in your API credentials:
-     - For Spotify: Get credentials from [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
-   - Set a secret key for Flask:
-     ```
-     FLASK_SECRET_KEY=your_secret_key_here
-     ```
-
-## Usage
-
-### Web Interface
-
-1. Start the web server:
+## Run the backend
 ```bash
+source venv/bin/activate   # if using venv
 python app.py
 ```
+Backend runs at `http://localhost:5000`. Keep this terminal open.
 
-2. Open your browser and go to `http://localhost:5000`
+## Load the browser extension
+### Chrome / Edge
+1) Open `chrome://extensions` (Edge: `edge://extensions`).
+2) Enable **Developer mode**.
+3) Click **Load unpacked**.
+4) Select the folder `vscode-extension/chrome/` inside this project.
 
-3. Paste a music link from any supported platform (Spotify, Deezer, or YouTube Music)
+### Firefox (temporary add-on)
+1) Open `about:debugging#addons`.
+2) Click **This Firefox**.
+3) Click **Load Temporary Add-on**.
+4) Select `manifest.json` inside `vscode-extension/chrome/`.
 
-4. Click "Convert" to get links to the same song on other platforms
+## Use
+1) Click the extension icon.
+2) Paste a music link (Spotify/Deezer/YouTube/etc.).
+3) Press **Find** to see available platforms; links open in new tab.
 
-### REST API
+## Environment variables (optional)
+Copy `.env.example` to `.env` and fill if you have tokens:
+- `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`
+- `APPLE_KEY_ID`, `APPLE_TEAM_ID`, `APPLE_SECRET_KEY`
+- `YANDEX_MUSIC_TOKEN`
+If not provided, some platforms may return limited results; basic search still works where possible.
 
-You can also use the REST API endpoint to convert links programmatically:
+## Troubleshooting
+- Backend not reachable: ensure `python app.py` is running and `http://localhost:5000` is accessible.
+- No results on some platforms: the song may not exist there or tokens are missing.
+- Firefox extension disappears after restart: temporary add-ons unload on browser restart—reload via steps above.
 
-```python
-import requests
+## Folder layout
+- `app.py` — Flask server exposing `/api/convert`
+- `music_search.py` — platform search/parse logic
+- `templates/`, `static/` — web UI for the Flask page
+- `vscode-extension/chrome/` — browser extension (manifest, popup)
 
-response = requests.post('http://localhost:5000/api/convert', 
-    json={'url': 'https://open.spotify.com/track/your_track_id'})
-result = response.json()
-```
-
-### Python Library
-
-```python
-from music_search import MusicPlatform
-
-# Initialize the client
-music = MusicPlatform()
-
-# 1. Search for a song across all platforms
-results = music.search_track("Bohemian Rhapsody", "Queen")
-print(results)
-
-# 2. Search on a specific platform
-spotify_results = music.search_track("Bohemian Rhapsody", "Queen", platform="spotify")
-print(spotify_results)
-
-# 3. Get song info from a platform-specific URL
-url = "https://open.spotify.com/track/your_track_id"
-song_info = music.get_song_info(url)
-print(song_info)
-```
-
-## Response Format
-
-All methods return a dictionary with standardized fields:
-
-```python
-{
-    'title': 'Song Title',
-    'artist': 'Artist Name',
-    'album': 'Album Name',
-    'url': 'Platform-specific URL'
-}
-```
-
-If an error occurs, the response will be:
-```python
-{
-    'error': 'Error message'
-}
-```
-
-## Error Handling
-
-The library handles various error cases gracefully:
-- Missing API credentials
-- Network errors
-- Invalid URLs
-- No search results
-
-Each error will return a dictionary with an 'error' key explaining the issue.
+Enjoy! 🎵

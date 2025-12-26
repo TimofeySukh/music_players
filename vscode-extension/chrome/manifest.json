@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "Music Converter",
+  "version": "1.0",
+  "description": "Music Link Converter",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "host_permissions": [
+    "http://localhost:5000/*"
+  ]
+}
